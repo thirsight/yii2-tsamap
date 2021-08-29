@@ -1,0 +1,18 @@
+{
+    "name": "thirsight/yii2-tsmd-flight",
+    "description": "Grab Flight Info for Yii2 ",
+    "keywords": ["tsmd", "flight"],
+    "license": "BSD-3-Clause",
+    "version": "1.0.0",
+    "homepage": "https://tsmd.thirsight.com/",
+    "authors": [
+        {
+            "name": "Haisenπ",
+            "email": "thirsight@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2.0",
+        "yiisoft/yii2": "~2.0.0"
+    }
+}
