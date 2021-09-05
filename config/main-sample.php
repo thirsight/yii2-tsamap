@@ -22,15 +22,10 @@ return [
         'flight' => [
             'class' => 'tsmd\flight\components\Flight',
             'crawlers' => [
-                [
-                    'class' => 'tsmd\flight\components\AirportTaipei',
-                ],
-                [
-                    'class' => 'tsmd\flight\components\AirportTaoyuan',
-                ],
-                [
-                    'class' => 'tsmd\flight\components\AirportInfoLive',
-                ],
+                'tsmd\flight\components\AirportInfoLive',
+                'tsmd\flight\components\AirportVariflight',
+                'tsmd\flight\components\AirportTaipei',
+                'tsmd\flight\components\AirportTaoyuan',
                 [
                     'class' => 'tsmd\flight\components\AirportHongkong',
                     'filterDests' => ['TPE', 'TSA', 'TXG', 'TTT', 'TNN', 'KHH', 'CYI'],

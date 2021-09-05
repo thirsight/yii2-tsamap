@@ -20,12 +20,10 @@ class AirportTaoyuan extends FlightCrawler
      */
     public function grabFlight(string $flightNo, string $date)
     {
-        foreach($this->possibleFltNoIATA($flightNo) as $fno) {
-            $flights = $this->grabDateFlights($date, $fno);
-            if ($flights) {
-                $flights[0]['flightNo'] = $flightNo;
-                return $flights[0];
-            }
+        $flights = $this->grabDateFlights($date, $flightNo);
+        if ($flights) {
+            $flights[0]['flightNo'] = $flightNo;
+            return $flights[0];
         }
         return [];
     }
@@ -54,6 +52,7 @@ class AirportTaoyuan extends FlightCrawler
         $raw = [];
         foreach ($forms as $form) {
             $resp = $this->client->post('https://www.taoyuan-airport.com/main_en/airData.aspx', [
+                'timeout' => 5,
                 'form_params' => $form,
             ]);
             $rows = json_decode(json_decode($resp->getBody()->getContents(), true), true);

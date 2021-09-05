@@ -50,13 +50,11 @@ class AirportHongkong extends FlightCrawler
         if (!isset($this->cacheFlights[$date])) {
             $this->grabDateFlights($date);
         }
-        foreach ($this->possibleFltNoIATA($flightNo) as $pfno) {
-            // 一航班号可能包含多个日期的航班信息
-            foreach ($this->cacheFlights[$date][$pfno] ?? [] as $info) {
-                if (stripos($info['etd'], $date) !== false) {
-                    $info['flightNo'] = $flightNo;
-                    return $info;
-                }
+        // 一航班号可能包含多个日期的航班信息
+        foreach ($this->cacheFlights[$date][$flightNo] ?? [] as $info) {
+            if (stripos($info['etd'], $date) !== false) {
+                $info['flightNo'] = $flightNo;
+                return $info;
             }
         }
         return [];
@@ -80,6 +78,7 @@ class AirportHongkong extends FlightCrawler
         $data = [];
         foreach (['true', 'false'] as $cargo) {
             $resp = $this->client->get('https://www.hongkongairport.com/flightinfo-rest/rest/flights', [
+                'timeout' => 5,
                 'query' => [
                     'span' => '1',
                     'date' => $date,

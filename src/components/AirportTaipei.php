@@ -100,10 +100,10 @@ class AirportTaipei extends FlightCrawler
      * @param string $flightNo
      * @return array
      */
-    public function grabFlightIATA(string $flightNo, $date)
+    public function grabFlight(string $flightNo, $date)
     {
         try {
-            $resp = $this->client->get("https://www.taipei-airport.com/taoyuan-flight-arrival/{$flightNo}");
+            $resp = $this->client->get("https://www.taipei-airport.com/taoyuan-flight-arrival/{$flightNo}", ['timeout' => 5]);
             $html = $resp->getBody()->getContents();
             $raw = $this->parseHtmlPatterns($html) ?: $this->parseHtmlPatternsPart($html);
             if (empty($raw)) {
@@ -134,23 +134,6 @@ class AirportTaipei extends FlightCrawler
         } catch (Exception $e) {
             return [];
         }
-    }
-
-    /**
-     * @param string $flightNo CI0608
-     * @param string $date eg: 2021-08-08
-     * @return array
-     */
-    public function grabFlight(string $flightNo, string $date = '')
-    {
-        foreach ($this->possibleFltNoIATA($flightNo) as $pfno) {
-            $info = $this->grabFlightIATA($pfno, $date);
-            if ($info) {
-                $info['flightNo'] = $flightNo;
-                return $info;
-            }
-        }
-        return [];
     }
 
     /**

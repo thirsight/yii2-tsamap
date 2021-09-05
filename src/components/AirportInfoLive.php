@@ -38,13 +38,14 @@ class AirportInfoLive extends FlightCrawler
      * @param string $date eg: 2021-08-08
      * @return array
      */
-    public function grabFlightIATA(string $flightNo, string $date)
+    public function grabFlight(string $flightNo, string $date)
     {
         $airline = substr($flightNo, 0, 2);
         $fnum = ltrim(substr($flightNo, 2), '0');
 
         try {
             $resp = $this->client->post("https://airportinfo.live/flightdata/get_flight.php", [
+                'timeout' => 5,
                 'headers' => [
                     'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:90.0) Gecko/20100101 Firefox/90.0',
                     'Referer' => "https://airportinfo.live/flight/{$airline}{$fnum}",
@@ -68,23 +69,6 @@ class AirportInfoLive extends FlightCrawler
 
         $this->format($raw);
         return $raw;
-    }
-
-    /**
-     * @param string $flightNo CI0608
-     * @param string $date eg: 2021-08-08
-     * @return array
-     */
-    public function grabFlight(string $flightNo, string $date)
-    {
-        foreach ($this->possibleFltNoIATA($flightNo) as $pfno) {
-            $info = $this->grabFlightIATA($pfno, $date);
-            if ($info) {
-                $info['flightNo'] = $flightNo;
-                return $info;
-            }
-        }
-        return [];
     }
 
     /**

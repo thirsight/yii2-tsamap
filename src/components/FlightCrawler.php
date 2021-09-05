@@ -2,6 +2,8 @@
 
 namespace tsmd\flight\components;
 
+use DateTime;
+use DateTimeZone;
 use yii\base\BaseObject;
 use yii\base\InvalidValueException;
 use GuzzleHttp\Client;
@@ -94,6 +96,26 @@ abstract class FlightCrawler extends BaseObject implements FlightCrawlerInterfac
     }
 
     /**
+     * @param string $remoteTz
+     * @param string $originTz
+     * @return bool|int
+     */
+    public function getTimezoneOffset($remoteTz = 'UTC', $originTz = '')
+    {
+        if (empty($originTz)) {
+            if (!is_string($originTz = date_default_timezone_get())) {
+                return false; // A UTC timestamp was returned -- bail out!
+            }
+        }
+        $origin_dtz = new DateTimeZone($originTz);
+        $remote_dtz = new DateTimeZone($remoteTz);
+        $origin_dt = new DateTime("now", $origin_dtz);
+        $remote_dt = new DateTime("now", $remote_dtz);
+        $offset = $origin_dtz->getOffset($origin_dt) - $remote_dtz->getOffset($remote_dt);
+        return $offset;
+    }
+
+    /**
      * 部分输入航班号与 IATA 定义的航班号可能存在差异，如：
      * - CI0608 -> CI608 (IATA)
      * - HX1274 -> HX274 (IATA)
@@ -101,12 +123,32 @@ abstract class FlightCrawler extends BaseObject implements FlightCrawlerInterfac
      * @param string $flightNo
      * @return array
      */
-    public function possibleFltNoIATA($flightNo)
+    public function possibleFlightNos($flightNo)
     {
+        if (preg_match('#^(\w{2})0+(\w+)$#', $flightNo, $m)) {
+            return [$m[1] . $m[2]];
+        }
         return array_unique([
             $flightNo,
             preg_replace('#^(\w{2})\d(\w+)$#', '$1$2', $flightNo),
         ]);
+    }
+
+    /**
+     * @param string $flightNo CI0608
+     * @param string $date eg: 2021-08-08
+     * @return array
+     */
+    public function grabFlightPossible(string $flightNo, string $date)
+    {
+        foreach ($this->possibleFlightNos($flightNo) as $pfno) {
+            $info = $this->grabFlight($pfno, $date);
+            if ($info) {
+                $info['flightNo'] = $flightNo;
+                return $info;
+            }
+        }
+        return [];
     }
 
     /**

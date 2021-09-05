@@ -36,7 +36,7 @@ class Flight extends BaseObject
         $date = date('Y-m-d', strtotime($date) ?: time());
 
         foreach ($this->crawlers as $crawler) {
-            if ($info = $crawler->grabFlight($flightNo, $date)) {
+            if ($info = $crawler->grabFlightPossible($flightNo, $date)) {
                 return $info;
             }
         }
