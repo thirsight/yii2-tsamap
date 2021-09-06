@@ -58,13 +58,14 @@ class AirportVariflight extends FlightCrawler
             foreach ($data as $key => &$d) {
                 $orgTzOffset = $tzUTCOffset - $d['orgTinezone'];
                 $dstTzOffset = $tzUTCOffset - $d['dstTinezone'];
-                $d['scheduledDepAt'] = isset($d['scheduledDeptime']) ? date('Y-m-d H:i:s', $d['scheduledDeptime'] + $orgTzOffset) : null;
-                $d['scheduledArrAt'] = isset($d['scheduledArrtime']) ? date('Y-m-d H:i:s', $d['scheduledArrtime'] + $dstTzOffset) : null;
-                $d['actualDepAt'] = isset($d['actualDeptime']) ? date('Y-m-d H:i:s', $d['actualDeptime'] + $orgTzOffset) : null;
-                $d['actualArrAt'] = isset($d['actualArrtime']) ? date('Y-m-d H:i:s', $d['actualArrtime'] + $dstTzOffset) : null;
+                $d['scheduledDepAt'] = !empty($d['scheduledDeptime']) ? date('Y-m-d H:i:s', $d['scheduledDeptime'] + $orgTzOffset) : null;
+                $d['scheduledArrAt'] = !empty($d['scheduledArrtime']) ? date('Y-m-d H:i:s', $d['scheduledArrtime'] + $dstTzOffset) : null;
+                $d['actualDepAt'] = !empty($d['actualDeptime']) ? date('Y-m-d H:i:s', $d['actualDeptime'] + $orgTzOffset) : null;
+                $d['actualArrAt'] = !empty($d['actualArrtime']) ? date('Y-m-d H:i:s', $d['actualArrtime'] + $dstTzOffset) : null;
                 $d['flightStatusCode'] = $this->statuses[$d['flightStatusCode']] ?? $d['flightStatusCode'];
 
-                if (stripos($d['scheduledArrAt'], $date) !== false || stripos($d['actualArrAt'], $date) !== false) {
+                if (stripos($d['scheduledDepAt'], $date) !== false || stripos($d['scheduledArrAt'], $date) !== false
+                    || stripos($d['actualDepAt'], $date) !== false || stripos($d['actualArrAt'], $date) !== false) {
                     $this->format($d);
                     return $d;
                 }
